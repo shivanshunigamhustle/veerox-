@@ -1,0 +1,77 @@
+[project]
+name = "veerox-core"
+version = "0.1.0"
+description = "Veerox AI — Voice + WhatsApp Agent backend"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+    "pydantic-settings",
+    "sqlalchemy[asyncio]",
+    "asyncpg",
+    "alembic",
+    "redis",
+    "httpx",
+    "websockets",
+    "slowapi",
+    "structlog",
+    "orjson",
+    "sentry-sdk[fastapi]",
+    "openai>=1.50",
+    "tiktoken",
+    "tenacity",
+    "psycopg2-binary>=2.9.12",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "mypy",
+    "pytest",
+    "pytest-asyncio",
+    "respx",
+    "aiosqlite",
+]
+
+# ---------------------------------------------------------------------------
+# Ruff
+# ---------------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.format]
+# Use ruff's default formatting settings.
+
+# ---------------------------------------------------------------------------
+# Mypy
+# ---------------------------------------------------------------------------
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
+[[tool.mypy.overrides]]
+# Channel adapters talk to third-party SDKs whose stubs are absent; keep lenient.
+module = "apps.api.channels.*"
+ignore_errors = true
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+# apps.api.core.* inherits the top-level strict = true — no override needed.
+# This entry is explicit for documentation clarity only.
+module = "apps.api.core.*"
+strict = true
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["apps/api/tests"]
