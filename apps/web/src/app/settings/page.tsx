@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import type { Prompts, Tool } from "@/lib/types";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Settings2, Wrench, Bot, AlertCircle } from "lucide-react";
 
 interface AdminSettings {
   environment: string;
@@ -11,14 +12,18 @@ interface AdminSettings {
   [key: string]: unknown;
 }
 
+import { ChevronRight } from "lucide-react";
+
 interface CollapsibleSectionProps {
   title: string;
+  icon?: React.ReactNode;
   defaultOpen?: boolean;
   children: React.ReactNode;
 }
 
 function CollapsibleSection({
   title,
+  icon,
   defaultOpen = false,
   children,
 }: CollapsibleSectionProps) {
@@ -27,10 +32,11 @@ function CollapsibleSection({
     <Card className="max-w-3xl">
       <CardHeader className="cursor-pointer select-none" onClick={() => setOpen((v) => !v)}>
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-gray-800">{title}</h2>
-          <span className="text-xs text-gray-500 font-mono">
-            {open ? "▾" : "▸"}
-          </span>
+          <div className="flex items-center gap-2">
+            {icon}
+            <h2 className="text-sm font-bold text-slate-800">{title}</h2>
+          </div>
+          <ChevronRight size={15} className={`text-slate-400 transition-transform duration-200 ${open ? "rotate-90" : ""}`} />
         </div>
       </CardHeader>
       {open && <CardContent>{children}</CardContent>}
@@ -81,112 +87,78 @@ export default function SettingsPage() {
   }, []);
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Settings</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        Read-only view of non-secret backend configuration.
-      </p>
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Settings</h1>
+        <p className="mt-1 text-sm text-slate-500">Read-only view of backend configuration and agent tools</p>
+      </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-5">
         {settingsLoading && (
-          <p className="text-gray-500 text-sm">Loading…</p>
+          <div className="h-32 rounded-2xl bg-white border border-slate-200 animate-pulse max-w-3xl" />
         )}
 
         {settingsError && (
-          <div className="rounded-md bg-red-50 border border-red-200 p-4 text-sm text-red-700">
-            {settingsError}
-          </div>
+          <div className="rounded-2xl bg-red-50 border border-red-200 px-5 py-4 text-sm text-red-700 max-w-3xl">❌ {settingsError}</div>
         )}
 
         {!settingsLoading && !settingsError && settings && (
           <Card className="max-w-3xl">
             <CardHeader>
-              <h2 className="text-base font-semibold text-gray-800">
-                Backend Config
-              </h2>
+              <div className="flex items-center gap-2">
+                <Settings2 size={16} className="text-slate-500" />
+                <h2 className="text-sm font-bold text-slate-800">Backend Config</h2>
+                <span className="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                  {settings.environment}
+                </span>
+              </div>
             </CardHeader>
             <CardContent>
-              <dl className="divide-y divide-gray-100">
+              <dl className="divide-y divide-slate-100">
                 <div className="flex justify-between py-3 text-sm">
-                  <dt className="text-gray-500 font-medium">Environment</dt>
-                  <dd className="text-gray-900 font-mono">
-                    {settings.environment}
-                  </dd>
+                  <dt className="text-slate-500 font-medium">Environment</dt>
+                  <dd className="font-mono text-slate-800 bg-slate-100 px-2 py-0.5 rounded text-xs">{settings.environment}</dd>
                 </div>
                 <div className="flex justify-between py-3 text-sm">
-                  <dt className="text-gray-500 font-medium">Default Org ID</dt>
-                  <dd className="text-gray-900 font-mono text-xs break-all">
-                    {settings.default_org_id}
-                  </dd>
+                  <dt className="text-slate-500 font-medium">Default Org ID</dt>
+                  <dd className="font-mono text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded break-all">{settings.default_org_id}</dd>
                 </div>
               </dl>
             </CardContent>
           </Card>
         )}
 
-        <CollapsibleSection title="Active Prompts">
-          {promptsLoading && (
-            <p className="text-gray-500 text-sm">Loading prompts…</p>
-          )}
-          {promptsError && (
-            <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
-              {promptsError}
-            </div>
-          )}
+        <CollapsibleSection title="Active Prompts" icon={<Bot size={15} className="text-slate-400" />}>
+          {promptsLoading && <div className="h-24 rounded-xl bg-slate-50 animate-pulse" />}
+          {promptsError && <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">❌ {promptsError}</div>}
           {!promptsLoading && !promptsError && prompts && (
             <div className="flex flex-col gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                  base
-                </p>
-                <pre className="rounded-md bg-gray-50 border border-gray-200 p-3 text-xs text-gray-800 whitespace-pre-wrap break-words font-mono">
-                  {prompts.base}
-                </pre>
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                  voice_append
-                </p>
-                <pre className="rounded-md bg-gray-50 border border-gray-200 p-3 text-xs text-gray-800 whitespace-pre-wrap break-words font-mono">
-                  {prompts.voice_append}
-                </pre>
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                  whatsapp_append
-                </p>
-                <pre className="rounded-md bg-gray-50 border border-gray-200 p-3 text-xs text-gray-800 whitespace-pre-wrap break-words font-mono">
-                  {prompts.whatsapp_append}
-                </pre>
-              </div>
+              {[["base", prompts.base], ["voice_append", prompts.voice_append], ["whatsapp_append", prompts.whatsapp_append]].map(([label, val]) => (
+                <div key={label}>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">{label}</p>
+                  <pre className="rounded-xl bg-slate-900 text-slate-100 border border-slate-700 p-4 text-xs whitespace-pre-wrap break-words font-mono leading-relaxed">
+                    {val}
+                  </pre>
+                </div>
+              ))}
             </div>
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Registered Tools">
-          {toolsLoading && (
-            <p className="text-gray-500 text-sm">Loading tools…</p>
-          )}
-          {toolsError && (
-            <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
-              {toolsError}
-            </div>
-          )}
+        <CollapsibleSection title="Registered Tools" icon={<Wrench size={15} className="text-slate-400" />}>
+          {toolsLoading && <div className="h-24 rounded-xl bg-slate-50 animate-pulse" />}
+          {toolsError && <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">❌ {toolsError}</div>}
           {!toolsLoading && !toolsError && tools && tools.length === 0 && (
-            <p className="text-gray-500 text-sm">No tools registered.</p>
+            <p className="text-slate-500 text-sm">No tools registered.</p>
           )}
           {!toolsLoading && !toolsError && tools && tools.length > 0 && (
             <div className="flex flex-col gap-4">
               {tools.map((tool, idx) => {
-                const name =
-                  tool.function?.name ??
-                  (typeof tool.name === "string" ? tool.name : `tool_${idx}`);
+                const name = tool.function?.name ?? (typeof tool.name === "string" ? tool.name : `tool_${idx}`);
                 return (
                   <div key={`${name}_${idx}`}>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                      {name}
-                    </p>
-                    <pre className="rounded-md bg-gray-50 border border-gray-200 p-3 text-xs text-gray-800 whitespace-pre-wrap break-words font-mono">
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-indigo-500 mb-1.5">{name}</p>
+                    <pre className="rounded-xl bg-slate-900 text-slate-100 border border-slate-700 p-4 text-xs whitespace-pre-wrap break-words font-mono leading-relaxed">
                       {JSON.stringify(tool, null, 2)}
                     </pre>
                   </div>

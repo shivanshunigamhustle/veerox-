@@ -3,12 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/lib/api";
 import type { Lead } from "@/lib/types";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table";
+import { Table, TableHeader, TableRow, TableCell } from "@/components/ui/table";
+import { Users, AlertCircle, Filter } from "lucide-react";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString();
@@ -38,23 +34,29 @@ export default function LeadsPage() {
     fetchLeads(intent);
   }, [intent, fetchLeads]);
 
-  return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900">Leads</h1>
+  const intentColors: Record<string, string> = {
+    book_appointment: "bg-indigo-100 text-indigo-700",
+    product_inquiry:  "bg-sky-100 text-sky-700",
+    support:          "bg-amber-100 text-amber-700",
+    other:            "bg-slate-100 text-slate-600",
+  };
 
+  return (
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Leads</h1>
+          <p className="mt-1 text-sm text-slate-500">Captured leads from all agent conversations</p>
+        </div>
         <div className="flex items-center gap-2">
-          <label
-            htmlFor="intent-filter"
-            className="text-sm text-gray-600 font-medium"
-          >
-            Filter by intent:
+          <label htmlFor="intent-filter" className="flex items-center gap-1 text-xs font-semibold uppercase tracking-widest text-slate-400">
+            <Filter size={12} /> Intent
           </label>
           <select
             id="intent-filter"
             value={intent}
             onChange={(e) => setIntent(e.target.value)}
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           >
             <option value="">All</option>
             <option value="book_appointment">Book Appointment</option>
@@ -65,20 +67,30 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {loading && <p className="text-gray-500 text-sm">Loading…</p>}
+      {loading && (
+        <div className="space-y-3">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-14 rounded-2xl bg-white border border-slate-200 animate-pulse" />
+          ))}
+        </div>
+      )}
 
       {error && (
-        <div className="rounded-md bg-red-50 border border-red-200 p-4 text-sm text-red-700 mb-6">
-          {error}
+        <div className="rounded-2xl bg-red-50 border border-red-200 px-5 py-4 text-sm text-red-700 mb-6 flex items-center gap-2">
+          <AlertCircle size={15} className="shrink-0" />{error}
         </div>
       )}
 
       {!loading && !error && leads.length === 0 && (
-        <p className="text-gray-500 text-sm">No leads yet.</p>
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center">
+          <Users size={40} className="text-slate-300 mb-3" />
+          <p className="text-slate-500 font-medium">No leads yet</p>
+          <p className="text-slate-400 text-sm mt-1">Leads will appear when the agent captures contact info</p>
+        </div>
       )}
 
       {!loading && !error && leads.length > 0 && (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
           <Table>
             <thead>
               <TableRow isHeader>
@@ -91,14 +103,18 @@ export default function LeadsPage() {
             <tbody>
               {leads.map((lead) => (
                 <TableRow key={lead.id}>
-                  <TableCell className="font-medium">{lead.name}</TableCell>
-                  <TableCell>{lead.phone}</TableCell>
                   <TableCell>
-                    <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
-                      {lead.intent}
+                    <span className="font-semibold text-slate-800">{lead.name ?? "—"}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-mono text-xs text-slate-600">{lead.phone ?? "—"}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${intentColors[lead.intent ?? "other"] ?? intentColors.other}`}>
+                      {lead.intent ?? "—"}
                     </span>
                   </TableCell>
-                  <TableCell>{formatDate(lead.created_at)}</TableCell>
+                  <TableCell className="text-xs text-slate-500">{formatDate(lead.created_at)}</TableCell>
                 </TableRow>
               ))}
             </tbody>

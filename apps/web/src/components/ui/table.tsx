@@ -30,8 +30,8 @@ export function TableRow({
       {...props}
       className={`${
         isHeader
-          ? "bg-gray-50"
-          : "border-t border-gray-100 hover:bg-gray-50 transition-colors"
+          ? "bg-slate-50"
+          : "border-t border-slate-100 hover:bg-indigo-50/40 transition-colors duration-100"
       } ${className}`}
     >
       {children}
@@ -47,7 +47,7 @@ export function TableHeader({
   return (
     <th
       {...props}
-      className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 ${className}`}
+      className={`px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-widest text-slate-400 ${className}`}
     >
       {children}
     </th>
@@ -60,7 +60,7 @@ export function TableCell({
   ...props
 }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td {...props} className={`px-4 py-3 text-gray-700 ${className}`}>
+    <td {...props} className={`px-5 py-3.5 text-sm text-slate-700 ${className}`}>
       {children}
     </td>
   );
