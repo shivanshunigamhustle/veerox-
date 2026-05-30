@@ -39,6 +39,14 @@ class Settings(BaseSettings):
     # Public base URL (used for TwiML <Stream url=...> and Meta webhook registration)
     public_base_url: str = "https://api.example.com"
 
+    # CORS — comma-separated list of allowed frontend origins. The localhost
+    # entries cover dev; production should also include the deployed dashboard
+    # origin(s), e.g. "https://veerox-web.vercel.app".
+    cors_allowed_origins: str = (
+        "http://localhost:3000,http://localhost:3001,"
+        "http://127.0.0.1:3000,http://127.0.0.1:3001"
+    )
+
     # Observability
     sentry_dsn: str | None = None
 
