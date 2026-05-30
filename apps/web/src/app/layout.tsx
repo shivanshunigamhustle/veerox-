@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Nav from "@/components/nav";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: "Veerox AI — Admin",
   description: "Admin dashboard for Veerox AI voice + WhatsApp agent",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+/**
+ * Root layout: html/body + global providers only. The sidebar shell lives in
+ * the (dashboard) route group so the (auth) login page can opt out of it.
+ */
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="flex h-screen overflow-hidden bg-slate-100">
-        <Nav />
-        <main className="flex-1 overflow-y-auto p-8">{children}</main>
+      <body className="bg-slate-100 text-slate-700 antialiased">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

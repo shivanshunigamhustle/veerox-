@@ -1,0 +1,71 @@
+"use client";
+
+import { AlertCircle, CheckCircle2, Pause, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+export interface KillSwitchBannerProps {
+  /** True when the agent is paused (kill switch engaged). */
+  enabled: boolean;
+  /** Disables the toggle while a mutation is in flight. */
+  loading?: boolean;
+  /** Called with the next desired state when the operator toggles. */
+  onToggle: (next: boolean) => void;
+}
+
+/**
+ * Top-of-dashboard banner reflecting + controlling the global kill switch
+ * (UI plan §5, §8.2). Red when paused, calm slate/emerald when live. Announced
+ * politely so screen readers hear state changes (a11y §10).
+ */
+export function KillSwitchBanner({
+  enabled,
+  loading = false,
+  onToggle,
+}: KillSwitchBannerProps) {
+  return (
+    <div
+      aria-live="polite"
+      className={cn(
+        "mb-6 flex flex-col gap-3 rounded-2xl border px-5 py-4 sm:flex-row sm:items-center sm:justify-between",
+        enabled
+          ? "border-red-300 bg-red-600 text-white shadow-lg shadow-red-200"
+          : "border-slate-200 bg-white text-slate-700 shadow-sm",
+      )}
+    >
+      <div className="flex items-center gap-3">
+        {enabled ? (
+          <AlertCircle size={20} className="shrink-0" aria-hidden />
+        ) : (
+          <CheckCircle2 size={20} className="shrink-0 text-emerald-600" aria-hidden />
+        )}
+        <div>
+          <p className="text-sm font-bold">
+            {enabled ? "Agent is PAUSED" : "Agent is live"}
+          </p>
+          <p className={cn("text-xs", enabled ? "text-red-100" : "text-slate-500")}>
+            {enabled
+              ? "Incoming messages receive a hold response until you resume."
+              : "Voice and WhatsApp messages are being answered automatically."}
+          </p>
+        </div>
+      </div>
+      <Button
+        variant={enabled ? "secondary" : "danger"}
+        size="sm"
+        loading={loading}
+        onClick={() => onToggle(!enabled)}
+      >
+        {!loading &&
+          (enabled ? (
+            <Play size={14} aria-hidden />
+          ) : (
+            <Pause size={14} aria-hidden />
+          ))}
+        {enabled ? "Resume agent" : "Pause agent"}
+      </Button>
+    </div>
+  );
+}
+
+export default KillSwitchBanner;

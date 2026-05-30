@@ -1,14 +1,18 @@
 import { HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
-}
-
-export function Card({ children, className = "", ...props }: CardProps) {
+export function Card({
+  children,
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
+      className={cn(
+        "rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200",
+        className,
+      )}
       {...props}
-      className={`rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 ${className}`}
     >
       {children}
     </div>
@@ -17,26 +21,59 @@ export function Card({ children, className = "", ...props }: CardProps) {
 
 export function CardHeader({
   children,
-  className = "",
+  className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
+      className={cn("border-b border-slate-100 px-6 py-4", className)}
       {...props}
-      className={`border-b border-slate-100 px-6 py-4 ${className}`}
     >
       {children}
     </div>
   );
 }
 
+export function CardTitle({
+  children,
+  className,
+  ...props
+}: HTMLAttributes<HTMLHeadingElement>) {
+  return (
+    <h3
+      className={cn("text-base font-semibold text-slate-800", className)}
+      {...props}
+    >
+      {children}
+    </h3>
+  );
+}
+
 export function CardContent({
   children,
-  className = "",
+  className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div {...props} className={`px-6 py-5 ${className}`}>
+    <div className={cn("px-6 py-5", className)} {...props}>
+      {children}
+    </div>
+  );
+}
+
+export function CardFooter({
+  children,
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-3 border-t border-slate-100 px-6 py-4",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </div>
   );

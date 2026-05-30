@@ -1,14 +1,15 @@
 import { HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
 export function Table({
   children,
-  className = "",
+  className,
   ...props
 }: HTMLAttributes<HTMLTableElement>) {
   return (
     <table
+      className={cn("w-full border-collapse text-sm", className)}
       {...props}
-      className={`w-full border-collapse text-sm ${className}`}
     >
       {children}
     </table>
@@ -22,17 +23,18 @@ interface TableRowProps extends HTMLAttributes<HTMLTableRowElement> {
 export function TableRow({
   children,
   isHeader = false,
-  className = "",
+  className,
   ...props
 }: TableRowProps) {
   return (
     <tr
-      {...props}
-      className={`${
+      className={cn(
         isHeader
           ? "bg-slate-50"
-          : "border-t border-slate-100 hover:bg-indigo-50/40 transition-colors duration-100"
-      } ${className}`}
+          : "border-t border-slate-100 hover:bg-indigo-50/40 transition-colors duration-100",
+        className,
+      )}
+      {...props}
     >
       {children}
     </tr>
@@ -41,13 +43,17 @@ export function TableRow({
 
 export function TableHeader({
   children,
-  className = "",
+  className,
   ...props
 }: ThHTMLAttributes<HTMLTableCellElement>) {
   return (
     <th
+      scope="col"
+      className={cn(
+        "px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-widest text-slate-400",
+        className,
+      )}
       {...props}
-      className={`px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-widest text-slate-400 ${className}`}
     >
       {children}
     </th>
@@ -56,11 +62,11 @@ export function TableHeader({
 
 export function TableCell({
   children,
-  className = "",
+  className,
   ...props
 }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td {...props} className={`px-5 py-3.5 text-sm text-slate-700 ${className}`}>
+    <td className={cn("px-5 py-3.5 text-sm text-slate-700", className)} {...props}>
       {children}
     </td>
   );
